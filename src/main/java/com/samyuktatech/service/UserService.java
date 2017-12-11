@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.samyuktatech.document.User;
 import com.samyuktatech.repository.UserRepository;
+import com.samyuktatech.util.Utility;
 
 @RestController
 @RequestMapping("/")
@@ -33,21 +34,15 @@ public class UserService {
 	 * @return
 	 */
 	@PostMapping()
-	public ResponseEntity<?> save(@Valid @RequestBody User user, Errors errors) {
+	public ResponseEntity<?> save(@Valid @RequestBody com.samyuktatech.comman.model.User modelUser, Errors errors) {
 		
-		if (errors.hasErrors()) {			
-			// get all errors
-            String msg = (errors.getAllErrors()
-				.stream()
-				.map(x -> x.getDefaultMessage())
-				.collect(Collectors.joining(",")));
-
-            return ResponseEntity.badRequest().body(msg);
-		}
-		else {			
-		    user = userRepository.save(user);		    
-		    return ResponseEntity.ok(user);		    
-		}		
+		// Map user objects	from Model to Document
+		User documentUser = Utility.userModelToDocument(modelUser);
+		
+		userRepository.save(documentUser);
+		
+	    return ResponseEntity.ok("Successfully saved.");		    
+				
 	}
 	
 	@GetMapping("/name")
